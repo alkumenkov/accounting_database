@@ -1,0 +1,770 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 9.5.12
+-- Dumped by pg_dump version 9.6.9
+
+-- Started on 2018-08-03 13:40:49 MSK
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- TOC entry 2254 (class 0 OID 0)
+-- Dependencies: 2253
+-- Name: DATABASE accounting_dbase; Type: COMMENT; Schema: -; Owner: postgres
+--
+
+COMMENT ON DATABASE accounting_dbase IS 'accounting for investors and traders';
+
+
+--
+-- TOC entry 1 (class 3079 OID 12393)
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- TOC entry 2257 (class 0 OID 0)
+-- Dependencies: 1
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
+
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
+--
+-- TOC entry 187 (class 1259 OID 871837)
+-- Name: account_properties; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.account_properties (
+    start_date date NOT NULL,
+    account text NOT NULL,
+    client_code text NOT NULL,
+    base_currency text NOT NULL,
+    valid_to date NOT NULL,
+    email text
+);
+
+
+ALTER TABLE public.account_properties OWNER TO postgres;
+
+--
+-- TOC entry 193 (class 1259 OID 976501)
+-- Name: assets_properties; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.assets_properties (
+    start_date date NOT NULL,
+    asset text NOT NULL,
+    account_name text NOT NULL,
+    exchange text NOT NULL,
+    valid_to date NOT NULL
+);
+
+
+ALTER TABLE public.assets_properties OWNER TO postgres;
+
+--
+-- TOC entry 2258 (class 0 OID 0)
+-- Dependencies: 193
+-- Name: TABLE assets_properties; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.assets_properties IS 'assets name on various exchanges';
+
+
+--
+-- TOC entry 192 (class 1259 OID 976481)
+-- Name: assets_properties1; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.assets_properties1 (
+    asset text NOT NULL,
+    account_name text NOT NULL,
+    exchange text NOT NULL
+);
+
+
+ALTER TABLE public.assets_properties1 OWNER TO postgres;
+
+--
+-- TOC entry 2259 (class 0 OID 0)
+-- Dependencies: 192
+-- Name: TABLE assets_properties1; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.assets_properties1 IS 'assets name on various exchanges';
+
+
+--
+-- TOC entry 185 (class 1259 OID 820951)
+-- Name: binance_exported_limits; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.binance_exported_limits (
+    curr_date date NOT NULL,
+    currency text NOT NULL,
+    client_code text NOT NULL,
+    incoming_position double precision,
+    incoming_blocked double precision,
+    current_position double precision,
+    current_blocked double precision,
+    start_time time without time zone,
+    last_time time without time zone
+);
+
+
+ALTER TABLE public.binance_exported_limits OWNER TO postgres;
+
+--
+-- TOC entry 2260 (class 0 OID 0)
+-- Dependencies: 185
+-- Name: TABLE binance_exported_limits; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.binance_exported_limits IS 'coin positions from binance';
+
+
+--
+-- TOC entry 182 (class 1259 OID 807666)
+-- Name: binance_exported_orders; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.binance_exported_orders (
+    curr_time bigint NOT NULL,
+    symbol text NOT NULL,
+    order_id text NOT NULL,
+    client_order_id text NOT NULL,
+    price double precision,
+    qty double precision,
+    orig_qty double precision,
+    executed_qty double precision,
+    status text,
+    type text,
+    side text,
+    stop_price double precision,
+    iceberg_qty double precision,
+    client_code text NOT NULL
+);
+
+
+ALTER TABLE public.binance_exported_orders OWNER TO postgres;
+
+--
+-- TOC entry 2261 (class 0 OID 0)
+-- Dependencies: 182
+-- Name: TABLE binance_exported_orders; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.binance_exported_orders IS 'export orders from binance';
+
+
+--
+-- TOC entry 183 (class 1259 OID 807728)
+-- Name: binance_exported_trades; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.binance_exported_trades (
+    curr_time bigint NOT NULL,
+    id text NOT NULL,
+    price double precision NOT NULL,
+    qty double precision NOT NULL,
+    commission double precision,
+    commissionasset text,
+    buyer text,
+    maker text,
+    bestmatch text,
+    order_id text NOT NULL,
+    client_code text NOT NULL,
+    symbol text
+);
+
+
+ALTER TABLE public.binance_exported_trades OWNER TO postgres;
+
+--
+-- TOC entry 2262 (class 0 OID 0)
+-- Dependencies: 183
+-- Name: TABLE binance_exported_trades; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.binance_exported_trades IS 'export trades from binance';
+
+
+--
+-- TOC entry 186 (class 1259 OID 871802)
+-- Name: client_code_properties; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.client_code_properties (
+    start_date date NOT NULL,
+    client_code text NOT NULL,
+    sec_params json,
+    valid_to date NOT NULL,
+    exchange text
+);
+
+
+ALTER TABLE public.client_code_properties OWNER TO postgres;
+
+--
+-- TOC entry 2263 (class 0 OID 0)
+-- Dependencies: 186
+-- Name: TABLE client_code_properties; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.client_code_properties IS 'client_code_properties';
+
+
+--
+-- TOC entry 188 (class 1259 OID 955229)
+-- Name: okex_exported_limits; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.okex_exported_limits (
+    curr_date date NOT NULL,
+    currency text NOT NULL,
+    client_code text NOT NULL,
+    incoming_position double precision,
+    incoming_blocked double precision,
+    current_position double precision,
+    current_blocked double precision,
+    start_time time without time zone,
+    last_time time without time zone
+);
+
+
+ALTER TABLE public.okex_exported_limits OWNER TO postgres;
+
+--
+-- TOC entry 2264 (class 0 OID 0)
+-- Dependencies: 188
+-- Name: TABLE okex_exported_limits; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.okex_exported_limits IS 'coin positions from okex';
+
+
+--
+-- TOC entry 194 (class 1259 OID 977010)
+-- Name: exchange_exported_limits; Type: MATERIALIZED VIEW; Schema: public; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW public.exchange_exported_limits AS
+ SELECT s.curr_date,
+    s.currency,
+    s.client_code,
+    s.incoming_position,
+    s.incoming_blocked,
+    s.current_position,
+    s.current_blocked,
+    s.start_time,
+    s.last_time
+   FROM ( SELECT binance_exported_limits.curr_date,
+            binance_exported_limits.currency,
+            binance_exported_limits.client_code,
+            binance_exported_limits.incoming_position,
+            binance_exported_limits.incoming_blocked,
+            binance_exported_limits.current_position,
+            binance_exported_limits.current_blocked,
+            binance_exported_limits.start_time,
+            binance_exported_limits.last_time
+           FROM public.binance_exported_limits
+        UNION
+         SELECT okex_exported_limits.curr_date,
+            okex_exported_limits.currency,
+            okex_exported_limits.client_code,
+            okex_exported_limits.incoming_position,
+            okex_exported_limits.incoming_blocked,
+            okex_exported_limits.current_position,
+            okex_exported_limits.current_blocked,
+            okex_exported_limits.start_time,
+            okex_exported_limits.last_time
+           FROM public.okex_exported_limits) s
+  WITH NO DATA;
+
+
+ALTER TABLE public.exchange_exported_limits OWNER TO postgres;
+
+--
+-- TOC entry 184 (class 1259 OID 818160)
+-- Name: exchange_exported_prices; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.exchange_exported_prices (
+    curr_date date NOT NULL,
+    symbol text NOT NULL,
+    close_price double precision
+);
+
+
+ALTER TABLE public.exchange_exported_prices OWNER TO postgres;
+
+--
+-- TOC entry 190 (class 1259 OID 955245)
+-- Name: okex_exported_trades; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.okex_exported_trades (
+    curr_time bigint NOT NULL,
+    id text NOT NULL,
+    price double precision NOT NULL,
+    qty double precision NOT NULL,
+    commission double precision,
+    commissionasset text,
+    buyer text,
+    maker text,
+    bestmatch text,
+    order_id text NOT NULL,
+    client_code text NOT NULL,
+    symbol text
+);
+
+
+ALTER TABLE public.okex_exported_trades OWNER TO postgres;
+
+--
+-- TOC entry 2265 (class 0 OID 0)
+-- Dependencies: 190
+-- Name: TABLE okex_exported_trades; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.okex_exported_trades IS 'export trades from okex';
+
+
+--
+-- TOC entry 181 (class 1259 OID 807446)
+-- Name: symbol_properties; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.symbol_properties (
+    start_date date NOT NULL,
+    symbol text NOT NULL,
+    asset text,
+    currency text,
+    exchange text NOT NULL,
+    lot double precision NOT NULL,
+    min_amound double precision NOT NULL,
+    exchange_name text NOT NULL,
+    type text NOT NULL,
+    valid_to date
+);
+
+
+ALTER TABLE public.symbol_properties OWNER TO postgres;
+
+--
+-- TOC entry 2266 (class 0 OID 0)
+-- Dependencies: 181
+-- Name: TABLE symbol_properties; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.symbol_properties IS 'свойства инструментов в нашей системе';
+
+
+--
+-- TOC entry 191 (class 1259 OID 976119)
+-- Name: user_cost_trading; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_cost_trading (
+    start_date date NOT NULL,
+    typeofcost text NOT NULL,
+    commission double precision NOT NULL,
+    exchange text NOT NULL,
+    valid_to date NOT NULL
+);
+
+
+ALTER TABLE public.user_cost_trading OWNER TO postgres;
+
+--
+-- TOC entry 2267 (class 0 OID 0)
+-- Dependencies: 191
+-- Name: TABLE user_cost_trading; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.user_cost_trading IS 'user_cost_trading';
+
+
+--
+-- TOC entry 195 (class 1259 OID 993016)
+-- Name: exchange_exported_trades; Type: MATERIALIZED VIEW; Schema: public; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW public.exchange_exported_trades AS
+ WITH export_binance AS (
+         SELECT trades.curr_date,
+            trades.curr_time,
+            sp.symbol,
+            trades.side,
+            trades.qty,
+            trades.price,
+            trades.id,
+            trades.order_id,
+            trades.commissionasset,
+            trades.commission,
+            trades.client_code
+           FROM (( SELECT to_date((to_timestamp(((binance_exported_trades.curr_time / 1000))::double precision))::text, 'YYYY-MM-DD'::text) AS curr_date,
+                    (to_timestamp(((binance_exported_trades.curr_time / 1000))::double precision))::time without time zone AS curr_time,
+                    binance_exported_trades.symbol,
+                        CASE
+                            WHEN (binance_exported_trades.buyer = 'true'::text) THEN 'BUY'::text
+                            ELSE 'SELL'::text
+                        END AS side,
+                    binance_exported_trades.qty,
+                    binance_exported_trades.price,
+                    binance_exported_trades.id,
+                    binance_exported_trades.order_id,
+                    binance_exported_trades.commissionasset,
+                    binance_exported_trades.commission,
+                    binance_exported_trades.client_code
+                   FROM public.binance_exported_trades) trades
+             JOIN public.symbol_properties sp ON (((trades.symbol = sp.exchange_name) AND (trades.curr_date >= sp.start_date) AND (trades.curr_date < sp.valid_to))))
+          ORDER BY trades.curr_date, trades.curr_time
+        ), export_okex AS (
+         SELECT trades.curr_date,
+            trades.curr_time,
+            sp.symbol,
+            trades.side,
+            trades.qty,
+            trades.price,
+            trades.id,
+            trades.order_id,
+                CASE
+                    WHEN (trades.side = 'SELL'::text) THEN sp.currency
+                    ELSE sp.asset
+                END AS commissionasset,
+            ((uct.commission * trades.qty) *
+                CASE
+                    WHEN (trades.side = 'SELL'::text) THEN trades.price
+                    ELSE (1)::double precision
+                END) AS commission,
+            trades.client_code
+           FROM ((( SELECT to_date((to_timestamp(((okex_exported_trades.curr_time / 1000))::double precision))::text, 'YYYY-MM-DD'::text) AS curr_date,
+                    (to_timestamp(((okex_exported_trades.curr_time / 1000))::double precision))::time without time zone AS curr_time,
+                    okex_exported_trades.symbol,
+                        CASE
+                            WHEN (okex_exported_trades.buyer = 'true'::text) THEN 'BUY'::text
+                            ELSE 'SELL'::text
+                        END AS side,
+                    okex_exported_trades.qty,
+                    okex_exported_trades.price,
+                    okex_exported_trades.id,
+                    okex_exported_trades.order_id,
+                    okex_exported_trades.commissionasset,
+                    okex_exported_trades.commission,
+                    okex_exported_trades.client_code
+                   FROM public.okex_exported_trades) trades
+             JOIN public.symbol_properties sp ON (((trades.symbol = sp.exchange_name) AND (trades.curr_date >= sp.start_date) AND (trades.curr_date < sp.valid_to))))
+             JOIN public.user_cost_trading uct ON (((sp.exchange = uct.exchange) AND (trades.curr_date >= uct.start_date) AND (trades.curr_date < uct.valid_to))))
+          ORDER BY trades.curr_date, trades.curr_time
+        )
+ SELECT export_binance.curr_date,
+    export_binance.curr_time,
+    export_binance.symbol,
+    export_binance.side,
+    export_binance.qty,
+    export_binance.price,
+    export_binance.id,
+    export_binance.order_id,
+    export_binance.commissionasset,
+    export_binance.commission,
+    export_binance.client_code
+   FROM export_binance
+UNION
+ SELECT export_okex.curr_date,
+    export_okex.curr_time,
+    export_okex.symbol,
+    export_okex.side,
+    export_okex.qty,
+    export_okex.price,
+    export_okex.id,
+    export_okex.order_id,
+    export_okex.commissionasset,
+    export_okex.commission,
+    export_okex.client_code
+   FROM export_okex
+  ORDER BY 1
+  WITH NO DATA;
+
+
+ALTER TABLE public.exchange_exported_trades OWNER TO postgres;
+
+--
+-- TOC entry 189 (class 1259 OID 955237)
+-- Name: okex_exported_orders; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.okex_exported_orders (
+    curr_time bigint NOT NULL,
+    symbol text NOT NULL,
+    order_id text NOT NULL,
+    client_order_id text NOT NULL,
+    price double precision,
+    qty double precision,
+    orig_qty double precision,
+    executed_qty double precision,
+    status text,
+    type text,
+    side text,
+    stop_price double precision,
+    iceberg_qty double precision,
+    client_code text NOT NULL
+);
+
+
+ALTER TABLE public.okex_exported_orders OWNER TO postgres;
+
+--
+-- TOC entry 2268 (class 0 OID 0)
+-- Dependencies: 189
+-- Name: TABLE okex_exported_orders; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.okex_exported_orders IS 'export orders from okex';
+
+
+--
+-- TOC entry 196 (class 1259 OID 993024)
+-- Name: trades_with_properties; Type: MATERIALIZED VIEW; Schema: public; Owner: postgres
+--
+
+CREATE MATERIALIZED VIEW public.trades_with_properties AS
+ SELECT tr.curr_date,
+    tr.curr_time,
+    tr.symbol,
+        CASE
+            WHEN (tr.side = 'BUY'::text) THEN 1
+            ELSE '-1'::integer
+        END AS side,
+    tr.qty,
+    tr.price,
+    tr.id,
+    tr.order_id,
+    tr.commissionasset,
+    tr.commission,
+    pr.asset,
+    pr.currency,
+    tr.client_code
+   FROM (public.exchange_exported_trades tr
+     JOIN public.symbol_properties pr ON (((pr.symbol = tr.symbol) AND (tr.curr_date >= pr.start_date) AND (tr.curr_date < pr.valid_to))))
+  WITH NO DATA;
+
+
+ALTER TABLE public.trades_with_properties OWNER TO postgres;
+
+--
+-- TOC entry 197 (class 1259 OID 1266849)
+-- Name: user_auth; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.user_auth (
+    user_name text NOT NULL,
+    hash text NOT NULL,
+    hash_init_date date NOT NULL
+);
+
+
+ALTER TABLE public.user_auth OWNER TO postgres;
+
+--
+-- TOC entry 2269 (class 0 OID 0)
+-- Dependencies: 197
+-- Name: TABLE user_auth; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.user_auth IS 'checking user auth';
+
+
+--
+-- TOC entry 198 (class 1259 OID 1266942)
+-- Name: users_and_accounts; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.users_and_accounts (
+    user_name text NOT NULL,
+    account text NOT NULL
+);
+
+
+ALTER TABLE public.users_and_accounts OWNER TO postgres;
+
+--
+-- TOC entry 2270 (class 0 OID 0)
+-- Dependencies: 198
+-- Name: TABLE users_and_accounts; Type: COMMENT; Schema: public; Owner: postgres
+--
+
+COMMENT ON TABLE public.users_and_accounts IS 'enabled accounts for each user name';
+
+
+--
+-- TOC entry 2114 (class 2606 OID 871844)
+-- Name: account_properties account_properties_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.account_properties
+    ADD CONSTRAINT account_properties_pk PRIMARY KEY (start_date, account, client_code, base_currency, valid_to);
+
+
+--
+-- TOC entry 2124 (class 2606 OID 976488)
+-- Name: assets_properties1 assets_properties1_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.assets_properties1
+    ADD CONSTRAINT assets_properties1_pk PRIMARY KEY (asset, account_name, exchange);
+
+
+--
+-- TOC entry 2126 (class 2606 OID 976508)
+-- Name: assets_properties assets_properties_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.assets_properties
+    ADD CONSTRAINT assets_properties_pk PRIMARY KEY (start_date, asset, exchange, valid_to);
+
+
+--
+-- TOC entry 2110 (class 2606 OID 820958)
+-- Name: binance_exported_limits binance_exported_limits_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.binance_exported_limits
+    ADD CONSTRAINT binance_exported_limits_pk PRIMARY KEY (curr_date, currency, client_code);
+
+
+--
+-- TOC entry 2104 (class 2606 OID 807673)
+-- Name: binance_exported_orders binance_exported_orders_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.binance_exported_orders
+    ADD CONSTRAINT binance_exported_orders_pk PRIMARY KEY (curr_time, symbol, order_id, client_order_id, client_code);
+
+
+--
+-- TOC entry 2106 (class 2606 OID 807735)
+-- Name: binance_exported_trades binance_exported_trades_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.binance_exported_trades
+    ADD CONSTRAINT binance_exported_trades_pk PRIMARY KEY (curr_time, id, order_id, client_code);
+
+
+--
+-- TOC entry 2112 (class 2606 OID 871809)
+-- Name: client_code_properties client_code_properties_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.client_code_properties
+    ADD CONSTRAINT client_code_properties_pk PRIMARY KEY (start_date, client_code, valid_to);
+
+
+--
+-- TOC entry 2108 (class 2606 OID 818167)
+-- Name: exchange_exported_prices exchange_exported_prices_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.exchange_exported_prices
+    ADD CONSTRAINT exchange_exported_prices_pk PRIMARY KEY (curr_date, symbol);
+
+
+--
+-- TOC entry 2116 (class 2606 OID 955236)
+-- Name: okex_exported_limits okex_exported_limits_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.okex_exported_limits
+    ADD CONSTRAINT okex_exported_limits_pk PRIMARY KEY (curr_date, currency, client_code);
+
+
+--
+-- TOC entry 2118 (class 2606 OID 955244)
+-- Name: okex_exported_orders okex_exported_orders_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.okex_exported_orders
+    ADD CONSTRAINT okex_exported_orders_pk PRIMARY KEY (curr_time, symbol, order_id, client_order_id, client_code);
+
+
+--
+-- TOC entry 2120 (class 2606 OID 955252)
+-- Name: okex_exported_trades okex_exported_trades_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.okex_exported_trades
+    ADD CONSTRAINT okex_exported_trades_pk PRIMARY KEY (curr_time, id, order_id, client_code);
+
+
+--
+-- TOC entry 2102 (class 2606 OID 807453)
+-- Name: symbol_properties symbol_properties_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.symbol_properties
+    ADD CONSTRAINT symbol_properties_pk PRIMARY KEY (start_date, symbol, exchange, lot, min_amound, exchange_name);
+
+
+--
+-- TOC entry 2128 (class 2606 OID 1266856)
+-- Name: user_auth user_auth_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_auth
+    ADD CONSTRAINT user_auth_pk PRIMARY KEY (user_name, hash, hash_init_date);
+
+
+--
+-- TOC entry 2122 (class 2606 OID 976126)
+-- Name: user_cost_trading user_cost_trading_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.user_cost_trading
+    ADD CONSTRAINT user_cost_trading_pk PRIMARY KEY (start_date, typeofcost, exchange, valid_to);
+
+
+--
+-- TOC entry 2130 (class 2606 OID 1266949)
+-- Name: users_and_accounts users_and_accounts_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.users_and_accounts
+    ADD CONSTRAINT users_and_accounts_pk PRIMARY KEY (user_name, account);
+
+
+--
+-- TOC entry 2256 (class 0 OID 0)
+-- Dependencies: 6
+-- Name: SCHEMA public; Type: ACL; Schema: -; Owner: postgres
+--
+
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM postgres;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO PUBLIC;
+
+
+-- Completed on 2018-08-03 13:40:49 MSK
+
+--
+-- PostgreSQL database dump complete
+--
+
